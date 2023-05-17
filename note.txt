@@ -1,0 +1,2 @@
+path to build:
+/home/divur/project/client/build

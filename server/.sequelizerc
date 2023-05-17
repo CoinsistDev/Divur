@@ -1,0 +1,10 @@
+require("babel-register");
+
+const path = require('path');
+
+module.exports = {
+   'config': path.resolve('./cli/config', 'config.json'),
+   'models-path': path.resolve('./cli/db', 'models'),
+   'seeders-path': path.resolve('./cli/db', 'seeders'),
+   'migrations-path': path.resolve('./cli/db', 'migrations')
+}
