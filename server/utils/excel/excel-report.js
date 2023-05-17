@@ -11,7 +11,7 @@ const reportKeys = {
   faildTime: "זמן כישלון",
   acceptTime: "זמן קבלה",
   readTime: "זמן קריאה",
-  //departmenId: "מזהה מחלקה",
+  cannedRepliesTitle: "שם תבנית",
   ProviderMessageId: "מזהה הודעה",
 };
 
@@ -20,6 +20,7 @@ const wscols = [
     {wch:14},
     {wch:71},
     {wch:12},
+    {wch:21},
     {wch:21},
     {wch:21},
     {wch:21},

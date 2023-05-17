@@ -1,4 +1,5 @@
 import Cron from 'node-cron'
+import levenshtein from 'fastest-levenshtein'
 import { getAllDepartmentsId } from '../dal/Deparment.js'
 import { getEvents, deleteEvents} from '../../api/controllers/glassix/index.js'
 import * as MessageLogDal from '../dal/messageLog.js'
@@ -27,8 +28,7 @@ export const getLogData = async (departmentId, startDate, endDate) => {
 }
 
 export const getLogDataToExcell = async (departmentId, startDate, endDate) => {
-    const messages = await MessageLogDal.getLog(departmentId, startDate, endDate)
-   // console.log(messages);
+    const messages = await MessageLogDal.getLog(departmentId, startDate, endDate)    
     return sortLogDataForExcel(messages)
 }
 
@@ -73,6 +73,9 @@ const sortLogData = async (messages) => {
   
 
 const sortLogDataForExcel = async (messages) => {
+    const cannedReplies = await DepartmentService.getGlassixCannedReplies(messages[0].departmentId)
+    const cannedRepliesText = cannedReplies.map(x => x.text)
+    const cannedRepliesTitle = cannedReplies.map(x => x.title)
     const logsByProvider = messages.reduce((acc, message) => {
       const { ProviderMessageId, Status, Date, To, From, Text, ProtocolType } = message;
       if (!acc[ProviderMessageId]) {
@@ -86,6 +89,7 @@ const sortLogDataForExcel = async (messages) => {
           acceptTime: '',
           readTime: '',
           ProviderMessageId,
+          cannedRepliesTitle : getCannedRepliesTitle(Text, cannedRepliesText, cannedRepliesTitle)
         };
       }
       if (Status !== 'Read' && Status !== 'Accepted' && !acc[ProviderMessageId].sendTime) {
@@ -108,8 +112,11 @@ const sortLogDataForExcel = async (messages) => {
   };
   
   
-  
-
+  const getCannedRepliesTitle = (text, cannedRepliesText, cannedRepliesTitle) => {
+    const closest = levenshtein.closest(text, cannedRepliesText)
+    const closetIndex = cannedRepliesText.findIndex(x => x == closest)
+    return cannedRepliesTitle[closetIndex]
+  }
 
 export const deleteMessage = async (payload) => {
     if (!payload.departmentId || !payload.messageId) throw new Error('departmentId or messageId is missing')
