@@ -19,6 +19,7 @@ export default observer(function ReportsDashboard() {
   const { currentDepartment } = departmentStore;
   const [value, setValue] = useState<DateRange<Date>>([null, null]);
   const [updates, setUpdates] = useState(0);
+  const [isExporting, setIsExporting] = useState(false);
 
   defaults.plugins.legend.display = false;
 
@@ -143,8 +144,15 @@ export default observer(function ReportsDashboard() {
               }}
             >
               <Form.Field width={12}>
-                {/* <Button variant='outlined' sx={{ margin: '0px 5px' }} color='primary' onClick={() => {setSelectedFilter('ticketData');updateData(true)}} >Ticket</Button> */}
-                <Button variant='outlined' sx={{ borderColor: 'green', color: 'green' }} onClick={() => sendReport()} >ייצא דוח Excell למייל</Button>
+                <Button variant='outlined' sx={{ borderColor: 'green', color: 'green' }} onClick={() => {
+    setIsExporting(true);
+    alert('הדוח נשלח למייל בזמן הקרוב.');
+    sendReport();
+    setTimeout(() => {
+      setIsExporting(false);
+    }, 60000); // חסימה של הכפתור למשך דקה (60000 מילישניות)
+  }}
+  disabled={isExporting} >ייצא דוח Excell למייל</Button>
               </Form.Field>
 
               <Form.Field width={16}>
