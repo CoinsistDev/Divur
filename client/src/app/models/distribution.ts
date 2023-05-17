@@ -1,5 +1,4 @@
 import { DistributionParameter } from "./distributionParameter";
-import { Tag } from "./tag";
 
 export interface Distribution {
     departmentId: string;
@@ -7,9 +6,7 @@ export interface Distribution {
     message: string;
     from: string;
     parameters: DistributionParameter[];
-    isNonTicket: string;
     isInternational: boolean;
-    tags: Tag[];
     isTimed:boolean;
     scheduleDate:Date | null;
     imageUrl?:string;
@@ -26,10 +23,7 @@ export class DistributionFormValues{
     message = "";
     from = "";
     parameters = [] as DistributionParameter[];
-    isNonTicket = false;
     isInternational = false;
-    tagsList = [] as Tag[];
-    selectedTags =[]  as Tag[];
     isTimed = false;
     scheduleDate : Date | null = null;
     imageUrl?:string = "";
@@ -42,9 +36,6 @@ export class DistributionFormValues{
             this.message = distributionData.message;
             this.from = distributionData.from;
             this.parameters = distributionData.parameters;
-            this.isNonTicket = distributionData.isNonTicket;
-            this.selectedTags = distributionData.selectedTags;
-            this.tagsList = distributionData.tagsList;
             this.isTimed = distributionData.isTimed;
             this.isInternational = distributionData.isInternational;
             this.scheduleDate = distributionData.scheduleDate;

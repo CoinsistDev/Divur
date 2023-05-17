@@ -6,34 +6,12 @@ import { DistributionFormValues } from '../models/distribution';
 
 export default class DistributionStore {
     distributionValues: DistributionFormValues = new DistributionFormValues();
-    tags: Tag[] = [];
     cannedReplies: CannedReply[] = [];
-    loadingTags: boolean = false;
     loadingCannedReplies: boolean = false;
 
 
     constructor() {
         makeAutoObservable(this);
-    }
-
-    loadTags = async (departmentId: string) => {
-
-        try {
-            this.loadingTags = true;
-            var loadedTags = await agent.Departments.getTags(departmentId);
-            runInAction(() => {
-                this.tags = loadedTags;
-                this.loadingTags = false;
-            })
-            return loadedTags;
-
-        }
-        catch (err) {
-            runInAction(() => {
-                console.log(err);
-                this.loadingTags = false;
-            })
-        }
     }
 
     loadCannedReplies = async (departmentId: string) => {

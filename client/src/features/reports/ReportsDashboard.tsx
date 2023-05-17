@@ -146,8 +146,8 @@ export default observer(function ReportsDashboard() {
               <Form.Field width={12}>
                 <Button variant='outlined' sx={{ borderColor: 'green', color: 'green' }} onClick={() => {
     setIsExporting(true);
-    alert('הדוח נשלח למייל בזמן הקרוב.');
     sendReport();
+    alert('הדוח נשלח למייל בזמן הקרוב.');
     setTimeout(() => {
       setIsExporting(false);
     }, 60000); // חסימה של הכפתור למשך דקה (60000 מילישניות)

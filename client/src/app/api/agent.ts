@@ -96,7 +96,6 @@ const Departments = {
     listAll: () => requests.get<Department[]>('department'),
     details: (id: string) => requests.get<Department>(`department/${id}`),
     edit: (department: Department) => requests.put(`department`, department),
-    getTags: (id: string) => requests.get<Tag[]>(`department/tags/${id}`),
     getCannedReplies: (id: string) => requests.get<CannedReply[]>(`department/cannedreplies/${id}`),
     addRemoveUser: (email: string, departmentId: string) => requests.post('department/adduser', { username: email, departmentId: departmentId }),
     removeUserDepartment : (email: string, departmentId: string) => requests.post('department/deleteuser', { username: email, departmentId: departmentId })
@@ -129,25 +128,11 @@ const Distribution = {
         if(distribtuionData.protocolType){
             formData.append('protocolType',distribtuionData.protocolType)
         }
-        if (distribtuionData.isNonTicket)
-            formData.append('isNonTicket', "false");
-        else
-            formData.append('isNonTicket', "true");
 
         if (distribtuionData.imageUrl)
             formData.append('imageUrl', distribtuionData.imageUrl);
 
-        let formattedTags = [] as string[];
-        let tagString = '';
-        distribtuionData.selectedTags.forEach(tag => {
-            formattedTags.push(tag.name)
-            tagString += tag.name + ','
-        })
-        tagString.substring(0, tagString.length - 1)
 
-        formData.append('tags', tagString.substring(0, tagString.length - 1));
-        if (distribtuionData.isTimed)
-            formData.append('ScheduleDate', distribtuionData.scheduleDate!.toISOString());
 
         const url = `distribution/${distribtuionData.departmentId}`;
             return axios.post<ScheduledTask>(url, formData, {
