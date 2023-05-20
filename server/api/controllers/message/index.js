@@ -4,6 +4,7 @@ import { sendEmail } from '../../../utils/email/sendEmail.js'
 import { verifyToken } from '../../../db/service/UserService.js'
 import { getMinimalDetails } from '../departments/index.js'
 import { uploadFileFromBuffer, getFileDownloadLink } from '../../../utils/blob-storage/upload-file.js'
+import logger from '../../../utils/logger/index.js'
 
 export const insertWebhookNonTicket = async (req, res) => {
     const response = await service.addMessageLog(req.body)
@@ -15,7 +16,7 @@ export const getLogData = async (req, res)=> {
     const startDate = new Date(req.query.startDate)
     const endDate = new Date(req.query.endDate)
     startDate.setHours(0,0,0,0)
-    endDate.setHours(23,59,0,0)
+    endDate.setHours(23, 59, 59, 999);
     const response = await service.getLogData(departmentId, startDate, endDate)
     res.send(response)
 }
@@ -50,6 +51,7 @@ export const getLogDataExcell = async (req, res)=> {
     const excelReportLink = await getFileDownloadLink(fileName + '.xlsx')
     const { email } = await verifyToken(token)
     sendEmail( email, fileName, { excelReportLink }, "./excelReportLink.handlebars");
+    logger.info(`Sheet ${fileName}.xlsx was send to ${email} successfully`);
     res.send(logData)
 }
 

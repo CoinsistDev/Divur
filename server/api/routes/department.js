@@ -45,12 +45,6 @@ departmentRouter.get('/:id',authorization, asyncHandler(async (req, res) => {
 }))
 
 
-// GetTags
-departmentRouter.get('/tags/:id', authorization, isDepartmentUser, asyncHandler(async (req, res) => {
-  const result = await departmentsController.getTags(req.params.id)
-  res.send(result)
-}))
-
 // Get CannedReplies
 departmentRouter.get('/cannedreplies/:id', authorization, isDepartmentUser, asyncHandler(async (req, res) => {
   const result = await departmentsController.cannedReplies(req.params.id)

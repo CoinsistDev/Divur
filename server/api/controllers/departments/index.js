@@ -17,10 +17,6 @@ export const update = async (payload) => {
   return mapper.toDepartment(await service.update(payload))
 }
 
-export const getTags = async (departmentId) => {
-  return await service.getGlassixTags(departmentId)
-}
-
 export const cannedReplies = async (departmentId) => {
   return await service.getGlassixCannedReplies(departmentId)
 }
@@ -43,7 +39,6 @@ export const getAll = async () => {
 
 export const getDetails = async (id) => {
  return mapper.toDepartmentDetails((await service.getDetails(id)))
-// return await service.getDetails(id)
 }
 
 export const getMinimalDetails = async (id) => {

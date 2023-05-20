@@ -1,16 +1,11 @@
 import handlebars from 'handlebars'
-import { createTicket, sendNonTicket, sendTicketMessage } from '../glassix/index.js'
+import { sendNonTicket } from '../glassix/index.js'
 
 export const sendMessage = async (jobData) => {
     try {
         const { clientData, generalData } = jobData
         const text = getText(generalData.Parameters, clientData, generalData.Message)
-        if (generalData.isNonTicket) {
-            return await sendNonTicket(generalData.departmentId, generalData, clientData.phone, text)
-        } else {
-            const ticketId = await createTicket(generalData.departmentId, generalData, clientData)
-            return await sendTicketMessage(generalData.departmentId, ticketId, text)
-        }
+        return await sendNonTicket(generalData.departmentId, generalData, clientData.phone, text)
     } catch (error) {
         console.log('sendMessage ERR');
         console.log(error);

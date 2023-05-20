@@ -15,10 +15,6 @@ const MessageLog = sequelizeConnection.define('message_log', {
   Date: {
     type: DataTypes.DATE,
   },
-  Ticket: {
-    allowNull: false,
-    type: DataTypes.BOOLEAN
-  },
   From: {
     allowNull: false,
     type: DataTypes.STRING
@@ -28,18 +24,26 @@ const MessageLog = sequelizeConnection.define('message_log', {
     type: DataTypes.STRING
   },
   Text: {
-    allowNull: false,
+    allowNull: true,
     type: DataTypes.TEXT
+  },
+  cannedRepliesTitle: {
+    allowNull: true,
+    type: DataTypes.STRING
   },
   Status: {
     type: DataTypes.STRING
+  },
+  isBlackList: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
   ProtocolType: {
     allowNull: false,
     type: DataTypes.STRING
   },
   ProviderMessageId: {
-    allowNull: false,
+    allowNull: true,
     type: DataTypes.STRING
   }
 }, {

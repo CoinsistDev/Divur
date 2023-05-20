@@ -1,6 +1,5 @@
-import moment from 'moment'
 import { Op } from 'sequelize'
-import { MessageLog, Department } from '../models/index.js'
+import { MessageLog } from '../models/index.js'
 import logger from '../../utils/logger/index.js'
 
 const expiryDate = 2;
@@ -15,7 +14,6 @@ export const createBulk = async (payload) => {
     try {
         const mesLog = await MessageLog.bulkCreate(payload)
         console.log('createBulk success');
-        console.log(payload);
         return true
     } catch (error) {
         logger.error(error)
@@ -53,4 +51,13 @@ export const deleteOldMessages = async () => {
     } catch (error) {
         console.log(error);
     }
+}
+
+export const updateCannedReplies  = async (cannedReplies) => {
+    try {
+        await MessageLog.bulkCreate(cannedReplies, {
+          updateOnDuplicate: ["cannedRepliesTitle"]});
+    } catch (error) {
+        console.log(error);
     }
+}

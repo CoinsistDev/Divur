@@ -5,7 +5,7 @@ import logger from '../../../utils/logger/index.js'
 import { excelToJson } from '../../../utils/excel/index.js';
 import { addJobsToQueue } from '../message-queue/index.js';
 import { canceldDistribution } from '../message-queue/canceldDistribution.js';
-
+import { addToMessageBlacklist } from '../../../db/service/MessageLogService.js'
 
 
 export const sendDistribution = async (req, res) => {
@@ -15,19 +15,25 @@ export const sendDistribution = async (req, res) => {
         return;
     }
     const data = matchedData(req);
-    data.tags = data.tags  ? JSON.parse(data.tags) : null
     data.Parameters = JSON.parse(data.Parameters)
-    logger.info(`Department:${data.departmentId} New Send data:\n from:${data.From}\n parameters:${JSON.stringify(data.Parameters)}\n isNonTicket:${data.isNonTicket}\n tags:${data.tags}\n date:${data.ScheduleDate}\n message:${data.Message}`);
+    logger.info(`Department:${data.departmentId} New Send data:\n from:${data.From}\n parameters:${JSON.stringify(data.Parameters)} \n date:${data.ScheduleDate}\n message:${data.Message}`);
     const department = await departmentsController.getDetails(data.departmentId)
     data.departmentName = department.name
-    const blacklist =  (await blacklistController.getAll(data.departmentId)).map(blackObj => blackObj.phone)
     const clientData = await excelToJson(req.file, data.isInternational)
-    const clientDataFilter = clientData.filter(x => !blacklist.includes(x.phone) )
+    const blacklist =  (await blacklistController.getAll(data.departmentId)).map(blackObj => blackObj.phone)
+    const blacklistSet = new Set(blacklist);
+    const clientDataFilter = clientData.filter(x => !blacklistSet.has(x.phone));
     const countMessage = data.protocolType === 'SMS' ? department.remainingSMSMessages : department.remainingMessages
     if (clientDataFilter.length > countMessage) throw new Error(` מספר הלקוחות בקובץ גדול ממספר ההודעות שנותרו בבנק, נא פנה לשירות הלקוחות Consist.Glassix@glassix.support `)
+    if (!clientDataFilter.length) throw new Error(` לא נמצאו לקוחות לשליחה - כנראה אין אנשי קשר בקובץ או שכולם נמצאים בהוסרו מדיוור `)
     ValidateParameters(clientDataFilter, data.Parameters, data.Message)
-    const response = await addJobsToQueue(clientDataFilter, data)
-   res.json(response)
+    const blacklistUsers = clientData.filter(x => blacklistSet.has(x.phone));
+
+
+    // const response = await addJobsToQueue(clientDataFilter, data)
+    addToMessageBlacklist(blacklistUsers, data)
+//    res.json(response)
+res.send()
 }
 
 
@@ -43,7 +49,6 @@ const ValidateParameters = (clientData, Parameters, Message) => {
         if (!everyParamExist)
             throw new Error(`Not all parameters in the message body are provided in the parameters array.`);
     }
-    console.log(clientData);
     const clientKey = Object.keys(clientData[0])
     fileParameterFromForm.forEach(element => {
         if (!clientKey.includes(element))

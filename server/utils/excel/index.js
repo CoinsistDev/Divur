@@ -39,9 +39,7 @@ const excelToJson = async (file, isIntenational) => {
     clientsData.forEach(client => client.phone = removeWhieSpace(client.phone));
     if (!isIntenational){
       clientsData.forEach(client => client.phone = fixPhone(client.phone));
-      console.log('israeli number');
     }
-    console.log(clientsData);
   return clientsData
 };
 

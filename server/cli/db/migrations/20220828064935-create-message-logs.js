@@ -12,10 +12,6 @@ module.exports = {
         type: Sequelize.DATE,
         default: Sequelize.NOW
       },
-      Ticket: {
-        allowNull: false,
-        type: Sequelize.BOOLEAN
-      },
       From: {
         allowNull: false,
         type: Sequelize.STRING

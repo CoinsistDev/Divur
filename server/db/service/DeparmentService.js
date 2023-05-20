@@ -1,5 +1,5 @@
 import * as DepartmentDal from '../dal/Deparment.js'
-import { getTags, getCannedReplies } from '../../api/controllers/glassix/index.js'
+import { getCannedReplies } from '../../api/controllers/glassix/index.js'
 import { getLogDataNoTime, addLogDataToArray } from './MessageLogService.js'
 import CryptoJS  from 'crypto-js'
 
@@ -35,9 +35,9 @@ export const getAll = async() => {
 }
 
 export const getDetails = async (id) => {
-    const messageLog = await getLogDataNoTime(id)
+    // const messageLog = await getLogDataNoTime(id)
     const department = await DepartmentDal.getDetails(id)
-    department.messageLog = messageLog
+    // department.messageLog = messageLog
     return department
 }
 
@@ -56,9 +56,6 @@ export const update = async (payload) => {
     return DepartmentDal.update(payload)
 }
 
-export const getGlassixTags = async (departmentId) => {
-    return await getTags(departmentId)
-}
 
 export const getGlassixCannedReplies = async (departmentId) => {
     return await getCannedReplies(departmentId)

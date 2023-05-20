@@ -5,6 +5,7 @@ import XLSX from 'xlsx'
 const reportKeys = {
   To: "מזהה לקוח",
   From: "נשלח ממספר",
+  isBlackList : "הוסר מדיוור",
   Text: "גוף ההודעה",
   ProtocolType: "ערוץ תקשורת",
   sendTime: "זמן שליחה",
@@ -18,6 +19,7 @@ const reportKeys = {
 const wscols = [
     {wch:14},
     {wch:14},
+    {wch:5},
     {wch:71},
     {wch:12},
     {wch:21},
@@ -34,7 +36,6 @@ const dbKeys = Object.keys(reportKeys).filter((key) => reportKeys[key]);
 const excelKeys = Object.values(reportKeys).filter((val) => val);
 
 export async function convertToExcel(data) {
-  console.log(`convertToExcel`);
   try {
     const aoa = data.map((obj) => dbKeys.map((key) => obj[key]));
     aoa.unshift(excelKeys);
@@ -42,7 +43,6 @@ export async function convertToExcel(data) {
     sheet["!cols"] = wscols;
     const workbook = { Workbook: { Views: [{ RTL: true }] }, Sheets: {}, SheetNames: [] }
     XLSX.utils.book_append_sheet(workbook, sheet, "Sheet 1");
-    logger.info(`sheet was added to report.xlsx successfully`);
     return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' })
   } catch (e) {
     console.log(e);

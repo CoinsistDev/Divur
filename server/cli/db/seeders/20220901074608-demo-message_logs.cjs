@@ -6,7 +6,6 @@ module.exports = {
       [
         {
           Date: new Date,
-          Ticket: false,
           From: '972528512673',
           To: '972528512673',
           Text: 'הי',

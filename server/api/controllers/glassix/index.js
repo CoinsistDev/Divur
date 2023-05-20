@@ -13,34 +13,15 @@ const cryptoSecret = process.env.CRYPTO_SECRET;
 const redis = new Redis({ maxRetriesPerRequest: null, });
 
 const getToken = async (apiKey, apiSecret, userName, subDomain) => {
-    const bytes =  CryptoJS.AES.decrypt(apiSecret, cryptoSecret);
-    apiSecret = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
     try {
+        const bytes =  CryptoJS.AES.decrypt(apiSecret, cryptoSecret);
+        apiSecret = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
         const res = await instance({
             method: 'POST',
             url: `https://${subDomain}.glassix.com/api/v1.2/token/get`,
             headers: { 'Content-type': 'application/json' },
             data: { apiKey, apiSecret, userName }
         })
-        console.log(res.data);
-        return res.data
-    } catch (error) {
-        const message = error.response && error.response.data.message ? error.response.data.message : error.message
-        throw new Error(message);
-    }
-}
-
-const getContact = async (contactId, departmentId) => {
-    const {accessToken, subDomain} = await getGlassixToken(departmentId)
-    try {
-        const res = await instance({
-            method: 'GET',
-            url: `https://${subDomain}.glassix.com/api/v1.2/contacts/get/${contactId}`,
-            headers: {
-                Accept: 'application/json', 'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`
-            }
-        });
         return res.data
     } catch (error) {
         const message = error.response && error.response.data.message ? error.response.data.message : error.message
@@ -49,32 +30,23 @@ const getContact = async (contactId, departmentId) => {
 }
 
 
-const getTags = async (departmentId) => {
-    const {accessToken, subDomain} = await getGlassixToken(departmentId)
-    try {
-        const response = await instance({
-            method: 'get',
-            url: `https://${subDomain}.glassix.com/api/v1.2/tenants/gettags`,
-            headers: { Authorization: `Bearer ${accessToken}` },
 
-        });
-        return response.data;
-    } catch (error) {
-        const message = error.response && error.response.data.message ? error.response.data.message : error.message
-        throw new Error(message);
-    }
-};
 
 const getCannedReplies = async (departmentId) => {
-    const {accessToken, subDomain} = await getGlassixToken(departmentId)
     try {
-        const response = await instance({
-            method: 'get',
-            url: `https://${subDomain}.glassix.com/api/v1.2/cannedreplies/getall`,
-            headers: { Authorization: `Bearer ${accessToken}` },
-
-        });
-        const whatsAppCanned = response.data.filter(x => x.categoryName === 'WhatsApp')
+        let cannedReplies = await redis.get(`getCannedReplies-${departmentId}`)
+        if (cannedReplies){
+            return JSON.parse(cannedReplies)
+            }
+             const {accessToken, subDomain} = await getGlassixToken(departmentId)
+             const response = await instance({
+                 method: 'get',
+                 url: `https://${subDomain}.glassix.com/api/v1.2/cannedreplies/getall`,
+                 headers: { Authorization: `Bearer ${accessToken}` },
+                 
+                });
+                const whatsAppCanned = response.data.filter(x => x.categoryName === 'WhatsApp')
+        await redis.set(`getCannedReplies-${departmentId}`, JSON.stringify(whatsAppCanned), 'EX', 2000)
         return whatsAppCanned;
         } catch (error) {
         const message = error.response?.data?.message || error.message
@@ -83,8 +55,8 @@ const getCannedReplies = async (departmentId) => {
 };
 
 const getEvents = async (departmentId) => {
-    const {accessToken, subDomain} = await getGlassixToken(departmentId)
     try {
+        const {accessToken, subDomain} = await getGlassixToken(departmentId)
         const response = await instance({
             method: 'get',
             url: `https://${subDomain}.glassix.com/api/v1.2/webhooks/getevents?deleteEvents=false`,
@@ -100,8 +72,8 @@ const getEvents = async (departmentId) => {
 };
 
 const deleteEvents = async (queueDetails, departmentId) => {
-    const {accessToken, subDomain} = await getGlassixToken(departmentId)
     try {
+        const {accessToken, subDomain} = await getGlassixToken(departmentId)
         const response = await instance({
             method: 'POST',
             url: `https://${subDomain}.glassix.com/api/v1.2/webhooks/deleteevents`,
@@ -116,8 +88,8 @@ const deleteEvents = async (queueDetails, departmentId) => {
 };
 
 const sendNonTicket = async (departmentId, generaldata, phoneNumber, message) => {   
-    const {accessToken, subDomain} = await getGlassixToken(departmentId)
     try {
+        const {accessToken, subDomain} = await getGlassixToken(departmentId)
         const response = await instance({
             method: 'POST',
             url: `https://${subDomain}.glassix.com/api/v1.2/protocols/send`,
@@ -139,60 +111,6 @@ const sendNonTicket = async (departmentId, generaldata, phoneNumber, message) =>
         logger.error(message)
         return { error: true, message }
         // throw new Error(message);
-    }
-};
-
-const sendTicketMessage = async (departmentId, ticketId, message) => {
-    const accessToken = await getGlassixToken(departmentId)
-    try {
-        const response = await instance({
-            method: 'POST',
-            url: `https://app.glassix.com/api/v1.2/tickets/send/${ticketId}`,
-            headers: { Authorization: `Bearer ${accessToken}` },
-            data: { enableFreeTextInput: false, text: message }
-
-        });
-      return { error: false, data: response.data }
-    } catch (error) {
-        const message = error.response?.data?.message || error.message
-        logger.error(message)
-        return { error: true, message }
-        // throw new Error(message);
-    }
-};
-
-
-const createTicket = async (departmentId, generalData, clientData) => {
-    const accessToken = await getGlassixToken(departmentId)
-    try {
-        const options = {
-            method: 'POST',
-            url: 'https://app.glassix.com/api/v1.2/tickets/create',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`
-            },
-            data: {
-                culture: 'he-IL',
-                participants: [
-                    {
-                        type: 'Client',
-                        protocolType: generalData.protocolType,
-                        identifier: clientData.phone,
-                        name: 'clientName'
-                    }
-                ],
-                tags: generalData.tags,
-                state: 'Open',
-                addIntroductionMessage: false,
-            }
-        };
-        const response = await instance(options);
-        return response.data.id;
-    } catch (error) {
-        const message = error.response?.data?.message || error.message
-        throw new Error(message);
     }
 };
 
@@ -218,4 +136,4 @@ const getGlassixToken = async (departmentId) => {
 }
 
 
-export { getContact, getTags, getCannedReplies, sendNonTicket, createTicket, sendTicketMessage, getEvents, deleteEvents }
+export { getCannedReplies, sendNonTicket, getEvents, deleteEvents }

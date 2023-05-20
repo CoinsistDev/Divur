@@ -19,20 +19,10 @@ export const validateSend = [
         .isString()
         .withMessage('נא להכניס פרמטרים')
         .bail(),
-    check('tags')
-        .exists()
-        .withMessage('נא להכניס תגיות')
-        .bail(),
     oneOf([
         check('protocolType').equals('WhatsApp'),
         check('protocolType').equals('SMS'),
     ], 'Incorrect protocol type please specify SMS or WhatsApp'),
-    check('isNonTicket')
-        .exists()
-        .toBoolean()
-        .isBoolean()
-        .withMessage('נא להכניס זה טיקט / בלי טיקט')
-        .bail(),
     check('isInternational')
         .exists()
         .toBoolean()

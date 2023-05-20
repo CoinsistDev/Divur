@@ -26,7 +26,6 @@ export async function convertToExcelBlackList(data) {
     const workbook = { Workbook: { Views: [{ RTL: true }] }, Sheets: {}, SheetNames: [] }
     XLSX.utils.book_append_sheet(workbook, sheet, "Sheet 1");
     return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' })
-    logger.info(`sheet was added to report.xlsx successfully`);
   } catch (e) {
     console.log(e);
     logger.error(`faild to add data to report.xlsx because "${e.message}"`);
