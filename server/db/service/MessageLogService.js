@@ -43,7 +43,7 @@ export const addToMessageBlacklist = async (blacklistUsers, generalData) => {
 
 export const getLogData = async (departmentId, startDate, endDate) => {
     const messages = await MessageLogDal.getLog(departmentId, startDate, endDate)
-    return sortLogData(messages)
+    return messages
 }
 
 export const getLogDataToExcell = async (departmentId, startDate, endDate) => {
@@ -214,7 +214,7 @@ export const deleteMessage = async (payload) => {
 
 
 export const getGlassixEvent = async () => {
-  setTimeout(getGlassixEvent, 30000); // Repeat every 30 seconds
+  setTimeout(getGlassixEvent, 40000); // Repeat every 40 seconds
   try {
     const depKeys = await getAllDepartmentsId();
     for (const department of depKeys) {
@@ -223,7 +223,7 @@ export const getGlassixEvent = async () => {
       if (nonTicketMessageEvent.length) {
         handleEvent(nonTicketMessageEvent);
       }
-      await new Promise((resolve) => setTimeout(resolve, 300)); // Wait for 300 milisecond
+      await new Promise((resolve) => setTimeout(resolve, 200)); // Wait for 200 milisecond
     }
   } catch (error) {
     logger.error(error);
