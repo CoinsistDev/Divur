@@ -1,6 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import agent from '../api/agent';
-import { Tag } from '../models/tag';
 import { CannedReply } from '../models/cannedReply';
 import { DistributionFormValues } from '../models/distribution';
 

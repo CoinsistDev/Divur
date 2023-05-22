@@ -4,4 +4,6 @@ export interface ScheduledTask{
  createdAt:Date
  scheduledFor:Date
  status:number;
+ distributor: string
+ distributionTitle: string
 }

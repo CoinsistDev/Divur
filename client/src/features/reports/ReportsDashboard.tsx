@@ -1,18 +1,11 @@
-import { useState } from "react";
-import {
-  Container,
-  Divider,
-  Form,
-  Grid,
-  Header,
-  Icon,
-} from "semantic-ui-react";
-import { defaults, Bar } from "react-chartjs-2";
-import { useStore } from "../../app/stores/store";
-import { DateRangePicker, LocalizationProvider, DateRange } from "@mui/lab";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import { Box, TextField, Button } from "@mui/material";
-import { observer } from "mobx-react-lite";
+import { useState } from 'react';
+import { Container, Divider, Form, Grid, Header, Icon } from 'semantic-ui-react';
+import { defaults, Bar } from 'react-chartjs-2';
+import { useStore } from '../../app/stores/store';
+import { DateRangePicker, LocalizationProvider, DateRange } from '@mui/lab';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import { Box, TextField, Button } from '@mui/material';
+import { observer } from 'mobx-react-lite';
 
 export default observer(function ReportsDashboard() {
   const { departmentStore } = useStore();
@@ -23,8 +16,9 @@ export default observer(function ReportsDashboard() {
 
   defaults.plugins.legend.display = false;
 
-  const nonTicketMessagesLabels = ["הגיעו ליעד", "נקראו", "נכשלו", "נשלחו"];
+  const nonTicketMessagesLabels = ['מוסרים מדיוור', 'הגיעו ליעד', 'נקראו', 'נכשלו', 'נשלחו'];
   const [nonTicketData, setNonTicketData] = useState([
+    currentDepartment!.totalBlackListMessage,
     currentDepartment!.totalNonTicketSent,
     currentDepartment!.totalNonTicketMessageRead,
     currentDepartment!.totalNonTicketMessageFailed,
@@ -33,48 +27,36 @@ export default observer(function ReportsDashboard() {
 
   const filterDate = async (reset?: boolean) => {
     if (reset) {
-      await departmentStore.getMessageStats(
-        departmentStore.currentDepartment!.id,
-        new Date("10/10/1970").toUTCString(),
-        new Date(Date.now()).toUTCString()
-      );
+      await departmentStore.getMessageStats(departmentStore.currentDepartment!.id, new Date('10/10/1970').toUTCString(), new Date(Date.now()).toUTCString());
       updateData();
       setUpdates(updates + 1);
       return;
     }
     if (currentDepartment && value[0] && value[1]) {
-      await departmentStore.getMessageStats(
-        departmentStore.currentDepartment!.id,
-        value[0]!.toUTCString(),
-        value[1]!.toUTCString()
-      );
+      await departmentStore.getMessageStats(departmentStore.currentDepartment!.id, value[0]?.toString() ?? '', value[1]?.toString() ?? '');
       updateData();
     }
+
     setUpdates(updates + 1);
   };
 
   const sendReport = async () => {
+    console.log('sending...');
+
     if (currentDepartment && value[0] && value[1]) {
-      await departmentStore.sendreport(
-        departmentStore.currentDepartment!.id,
-        value[0]!.toUTCString(),
-        value[1]!.toUTCString()
-      );
-    }else{
-        await departmentStore.sendreport(
-            departmentStore.currentDepartment!.id,
-            new Date("10/10/1970").toUTCString(),
-            new Date(Date.now()).toUTCString()
-          );
+      await departmentStore.sendreport(departmentStore.currentDepartment!.id, value[0]?.toString() ?? '', value[1]?.toString() ?? '');
+    } else {
+      await departmentStore.sendreport(departmentStore.currentDepartment!.id, new Date('10/10/1970').toUTCString(), new Date(Date.now()).toUTCString());
     }
   };
 
   const updateData = () => {
     const newNonTicketData = [
-      currentDepartment!.totalNonTicketSent,
+      currentDepartment!.totalBlackListMessage,
+      currentDepartment!.totalNonTicketMessageDelivered,
       currentDepartment!.totalNonTicketMessageRead,
       currentDepartment!.totalNonTicketMessageFailed,
-      currentDepartment!.totalNonTicketMessageDelivered,
+      currentDepartment!.totalNonTicketSent,
     ];
     const newData = data;
     setNonTicketData(newNonTicketData);
@@ -82,7 +64,6 @@ export default observer(function ReportsDashboard() {
     newData.datasets[0].data = newNonTicketData;
     setData(newData);
   };
-
 
   const [data, setData] = useState({
     labels: nonTicketMessagesLabels,
@@ -95,33 +76,30 @@ export default observer(function ReportsDashboard() {
           },
         },
         backgroundColor: [
-          "rgba(255, 99, 132, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(255, 206, 86, 0.2)",
-          "rgba(75, 192, 192, 0.2)",
-          "rgba(153, 102, 255, 0.2)",
-          "rgba(255, 159, 64, 0.2)",
+          '#9E9E9E', // Blacklist Member
+          '#FFC107', // Arrive
+          '#3F51B5', // Read
+          '#F44336', // Failed
+          '#4CAF50', // Send
         ],
         borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(153, 102, 255, 1)",
-          "rgba(255, 159, 64, 1)",
+          '#9E9E9E', // Blacklist Member
+          '#FFC107', // Arrive
+          '#3F51B5', // Read
+          '#F44336', // Failed
+          '#4CAF50', // Send
         ],
-
         borderWidth: 1,
       },
     ],
   });
 
   return (
-    <Container fluid style={{ direction: "rtl" }}>
-      <Grid style={{ height: "100vh", marginTop: "40px", direction: "rtl" }}>
-        <Grid.Row style={{ paddingRight: "80px", height: "00px" }}>
-          <Header textAlign="right" as="h2" style={{ paddingBottom: "20px" }}>
-            <Icon name="book" style={{ paddingLeft: "20px" }} />
+    <Container fluid style={{ direction: 'rtl' }}>
+      <Grid style={{ height: '100vh', marginTop: '40px', direction: 'rtl' }}>
+        <Grid.Row style={{ paddingRight: '80px', height: '00px' }}>
+          <Header textAlign="right" as="h2" style={{ paddingBottom: '20px' }}>
+            <Icon name="book" style={{ paddingLeft: '20px' }} />
             <Header.Content>
               דוחות
               <Header.Subheader>בדקו מה מצב הדיוור שלכם</Header.Subheader>
@@ -129,7 +107,7 @@ export default observer(function ReportsDashboard() {
             <Divider />
           </Header>
         </Grid.Row>
-        <Grid.Row style={{ height: "100%" }}>
+        <Grid.Row style={{ height: '100%' }}>
           <Grid.Column computer={1}></Grid.Column>
           <Grid.Column computer={10} verticalAlign="middle">
             <Bar key={updates} data={data} />
@@ -138,24 +116,12 @@ export default observer(function ReportsDashboard() {
             <Header content="Filters" />
             <Form
               style={{
-                display: "flex",
-                alignItems: "center",
-                flexDirection: "column",
+                display: 'flex',
+                alignItems: 'center',
+                flexDirection: 'column',
               }}
             >
-              <Form.Field width={12}>
-                <Button variant='outlined' sx={{ borderColor: 'green', color: 'green' }} onClick={() => {
-    setIsExporting(true);
-    sendReport();
-    alert('הדוח נשלח למייל בזמן הקרוב.');
-    setTimeout(() => {
-      setIsExporting(false);
-    }, 60000); // חסימה של הכפתור למשך דקה (60000 מילישניות)
-  }}
-  disabled={isExporting} >ייצא דוח Excell למייל</Button>
-              </Form.Field>
-
-              <Form.Field width={16}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <DateRangePicker
                     startText="תאריך התחלה"
@@ -163,38 +129,36 @@ export default observer(function ReportsDashboard() {
                     value={value}
                     onChange={(newValue) => setValue(newValue)}
                     renderInput={(startProps, endProps) => (
-                      <>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <TextField {...startProps} />
-                        <Box sx={{ mx: 2 }}> - </Box>
+                        <Box>-</Box>
                         <TextField {...endProps} />
-                      </>
+                      </Box>
                     )}
                   />
                 </LocalizationProvider>
-                <Box display="flex" alignItems="center" justifyContent="center">
-                  <Button
-                    sx={{ marginTop: 1 }}
-                    onClick={() => {
-                      setValue([null, null]);
-                      filterDate(true);
-                    }}
-                    variant="outlined"
-                    color="primary"
-                    disabled={!value[0] || !value[1]}
-                  >
-                    Reset
-                  </Button>
-                  <Button
-                    sx={{ marginTop: 1 }}
-                    onClick={() => filterDate(false)}
-                    variant="outlined"
-                    color="primary"
-                    disabled={!value[0] || !value[1]}
-                  >
-                    Filter By Dates
-                  </Button>
-                </Box>
-              </Form.Field>
+                <Button onClick={() => filterDate(true)} variant="outlined" color="primary" disabled={!value[0] || !value[1]}>
+                  Reset
+                </Button>
+                <Button onClick={() => filterDate(false)} variant="outlined" color="primary" disabled={!value[0] || !value[1]}>
+                  Filter By Dates
+                </Button>
+              </Box>
+              <Button
+                variant="outlined"
+                sx={{ borderColor: 'green', color: 'green', marginTop: '20px' }}
+                onClick={() => {
+                  setIsExporting(true);
+                  sendReport();
+                  alert('הדוח נשלח למייל בזמן הקרוב.');
+                  setTimeout(() => {
+                    setIsExporting(false);
+                  }, 60000); // Disable button for 1 minute (60000 milliseconds)
+                }}
+                disabled={isExporting}
+              >
+                Export Excel Report to Email
+              </Button>
             </Form>
           </Grid.Column>
         </Grid.Row>

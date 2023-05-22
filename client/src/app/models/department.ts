@@ -16,13 +16,11 @@ export interface Department {
     users: User[];
     phoneNumbers: PhoneNumber[];
     scheduledDistributionTasks: ScheduledTask[];
-    totalMessageSent: number;
     totalNonTicketSent: number;
+    totalBlackListMessage: number;
     totalNonTicketMessageDelivered: number;
-    totalTicketMessageDelivered: number;
     totalNonTicketMessageRead: number;
     totalNonTicketMessageFailed: number;
-    totalTicketMessageFailed: number;
 }
 
 export class Department implements Department {
