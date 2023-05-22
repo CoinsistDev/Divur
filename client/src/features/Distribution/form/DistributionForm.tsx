@@ -166,27 +166,6 @@ export default observer(function DistributionForm() {
                                 })
                               }
                             />
-                            <Button
-                              type="button"
-                              floated="left"
-                              size="mini"
-                              primary
-                              icon="edit"
-                              onClick={() => {
-                                values.parameters = [];
-                                var pattern = /[^{{}}]+(?=\})/g;
-                                var paramsToAdd = values.message.match(pattern)?.filter((v, i, a) => a.indexOf(v) === i);
-
-                                if ((paramsToAdd?.length || undefined) && paramsToAdd!.length > 0) {
-                                  paramsToAdd?.forEach((param) =>
-                                    push({
-                                      messageParameter: param,
-                                      fileParameter: '',
-                                    })
-                                  );
-                                }
-                              }}
-                            />
                           </Grid.Column>
                         </Grid>
 
