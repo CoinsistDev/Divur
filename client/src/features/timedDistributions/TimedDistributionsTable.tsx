@@ -18,6 +18,7 @@ const TimedDistributionsTable = observer(function () {
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [filteredTasks, setFilteredTasks] = useState<ScheduledTask[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [exporting, setExporting] = useState(false);
   const itemsPerPage = 20;
 
   const handleCancelTask = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, taskId: string) => {
@@ -58,7 +59,12 @@ const TimedDistributionsTable = observer(function () {
   };
 
   const handleExportToExcel = async () => {
+    setExporting(true);
     await departmentStore.sendTaskReport(departmentStore.currentDepartment!.id, startDate, endDate, filteredTasks);
+    window.alert('דוח הפצות נשלח לתיבת המייל שלך');
+    setTimeout(() => {
+      setExporting(false);
+    }, 30000);
   };
 
   const totalPages = Math.ceil((filteredTasks?.length || 0) / itemsPerPage);
@@ -82,28 +88,21 @@ const TimedDistributionsTable = observer(function () {
 
         <Form celled style={{ direction: 'rtl' }}>
           <Form.Group>
-            <Grid columns={4} stackable style={{ width: '100%' }}>
-              <Grid.Column style={{ width: '25%' }}>
+            <Grid columns={3} stackable style={{ width: '100%' }}>
+              <Grid.Column style={{ width: '33%' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                   <label style={{ marginBottom: '0.5em' }}>מתאריך:</label>
                   <DatePicker selected={startDate} onChange={(date: Date | null) => setStartDate(date)} dateFormat="dd/MM/yyyy" isClearable />
                 </div>
               </Grid.Column>
-              <Grid.Column style={{ width: '25%' }}>
+              <Grid.Column style={{ width: '33%' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                   <label style={{ marginBottom: '0.5em' }}>עד תאריך:</label>
                   <DatePicker selected={endDate} onChange={(date: Date | null) => setEndDate(date)} dateFormat="dd/MM/yyyy" isClearable />
                 </div>
               </Grid.Column>
-              <Grid.Column style={{ width: '25%' }}>
-                <div style={{ height: '100%', display: 'flex', alignItems: 'flex-end' }}>
-                  <Form.Button primary onClick={handleFilter}>
-                    סנן
-                  </Form.Button>
-                </div>
-              </Grid.Column>
-              <Grid.Column style={{ width: '25%', textAlign: 'left', display: 'flex', alignItems: 'flex-end' }}>
-                <Form.Button color="green" onClick={handleExportToExcel} disabled={filteredTasks?.length === 0}>
+              <Grid.Column style={{ width: '33%', textAlign: 'left', display: 'flex', alignItems: 'flex-end' }}>
+                <Form.Button color="green" onClick={handleExportToExcel} disabled={exporting || filteredTasks?.length === 0}>
                   <span>שליחת דוח למייל</span>
                   <i className="file excel outline icon" style={{ marginLeft: '0.2em' }}></i>
                 </Form.Button>
