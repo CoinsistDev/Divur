@@ -94,7 +94,10 @@ export const toScheduledDistributionTasks = (task) => {
         createdAt: task.createdAt.toISOString().replace('Z', ''),
         scheduledFor: task.scheduledFor.toISOString().replace('Z', ''),
         status : task.status,
-        department : task.departmentId
+        department : task.departmentId,
+        distributor : task.distributor,
+        distributionTitle : task.distributionTitle
+
     }))
     return fixTask
 }

@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import asyncHandler from "express-async-handler"
 import logger from '../../utils/logger/index.js'
-import { isAdmin, authorization, isAdminOrImplementor, isDepartmentUser } from '../../middleware/authMiddleware.js'
+import { authorization, isDepartmentUser } from '../../middleware/authMiddleware.js'
 import { insertWebhookNonTicket, getLogData, deleteMessage, getLogDataExcell } from '../controllers/message/index.js'
 
 

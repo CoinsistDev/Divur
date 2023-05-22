@@ -3,31 +3,21 @@ import XLSX from 'xlsx'
 
 
 const reportKeys = {
-  To: "מזהה לקוח",
-  From: "נשלח ממספר",
-  isBlackList : "הוסר מדיוור",
-  Text: "גוף ההודעה",
-  ProtocolType: "ערוץ תקשורת",
-  sendTime: "זמן שליחה",
-  faildTime: "זמן כישלון",
-  acceptTime: "זמן קבלה",
-  readTime: "זמן קריאה",
-  cannedRepliesTitle: "שם תבנית",
-  ProviderMessageId: "מזהה הודעה",
+  taskId: "מזהה",
+  createdAt: "נוצרה בתאריך",
+  scheduledFor : "מתוזמנת לתאריך",
+  status: "סטטוס",
+  distributor: "משתמש",
+  distributionTitle: "שם תבנית"
 };
 
 const wscols = [
+    {wch:5},
+    {wch:20},
+    {wch:20},
     {wch:14},
     {wch:14},
-    {wch:9},
-    {wch:71},
-    {wch:12},
-    {wch:21},
-    {wch:21},
-    {wch:21},
-    {wch:21},
-    {wch:21},
-    {wch:36}
+    {wch:20}
 ];
 
 
@@ -35,7 +25,7 @@ const wscols = [
 const dbKeys = Object.keys(reportKeys).filter((key) => reportKeys[key]);
 const excelKeys = Object.values(reportKeys).filter((val) => val);
 
-export async function convertToExcel(data) {
+export async function convertScheduledToExcel(data) {
   try {
     const aoa = data.map((obj) => dbKeys.map((key) => obj[key]));
     aoa.unshift(excelKeys);

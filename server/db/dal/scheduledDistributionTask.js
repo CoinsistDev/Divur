@@ -2,13 +2,15 @@ import { ScheduledDistributionTask, Department } from '../models/index.js'
 
 
 
-export const createScheduledJob = async (scheduledFor, departmentId) => {
+export const createScheduledJob = async (scheduledFor, departmentId, distributor, distributionTitle) => {
     const mesLog = await ScheduledDistributionTask.create({
         scheduledFor,
         status: 2,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            departmentId
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        departmentId,
+        distributor,
+        distributionTitle
     })
     return mesLog
 }

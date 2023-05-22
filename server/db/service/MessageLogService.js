@@ -47,61 +47,10 @@ export const getLogData = async (departmentId, startDate, endDate) => {
 }
 
 export const getLogDataToExcell = async (departmentId, startDate, endDate) => {
-    const messages = await MessageLogDal.getLog(departmentId, startDate, endDate)  
+    const messages = await MessageLogDal.getLogForExcell(departmentId, startDate, endDate)  
     return sortLogDataForExcel(messages)
 }
 
-export const getLogDataNoTime = async (departmentId) => {
-    const messages = await MessageLogDal.getLogNoTime(departmentId)
-    return sortLogData(messages)
-}
-
-export const addLogDataToArray =  (departments) => {
-    const departmentsWithMessages =  departments.map( dep => {
-        const messageLog =  sortLogData(dep.message_logs)
-        dep.messageLog = messageLog
-        return dep
-    })
-    return departmentsWithMessages
-}
-
-const sortLogData = async (messages) => {
-  let totalNonTicketMessageDelivered = 0;
-  let totalNonTicketSent = 0;
-  let totalNonTicketMessageRead = 0;
-  let totalNonTicketMessageFailed = 0;
-  let totalBlackListMessage = 0;
-
-  for (const message of messages) {
-    if (!message.isBlackList && message.Status != "Read" && message.Status != "Accepted") {
-      totalNonTicketMessageDelivered++;
-    }
-    if (!message.isBlackList && message.Status == "Delivered") {
-      totalNonTicketSent++;
-    }
-    if (!message.isBlackList && message.Status == "Read") {
-      totalNonTicketMessageRead++;
-    }
-    if (!message.isBlackList && message.Status == "Rejected") {
-      totalNonTicketMessageFailed++;
-    }
-    if (message.isBlackList){
-      totalBlackListMessage++
-    }
-  }
-
-  const messageLogStats = {
-    totalNonTicketMessageDelivered,
-    totalNonTicketSent,
-    totalNonTicketMessageRead,
-    totalNonTicketMessageFailed,
-    totalBlackListMessage
-  };
-
-  return messageLogStats;
-};
-
-  
 
   const sortLogDataForExcel = async (messages) => {
     const messageToUpdate = []
@@ -181,7 +130,7 @@ const sortLogData = async (messages) => {
     return cannedRepliesTitle[closetIndex]
   }
 
-    const getCannedRepliesTitleEvent = async (departmentId, text) => {
+  export const getCannedRepliesTitleEvent = async (departmentId, text) => {
       const cannedReplies = await DepartmentService.getGlassixCannedReplies(departmentId);      
       const cannedRepliesText = [];
       const cannedRepliesTitle = [];

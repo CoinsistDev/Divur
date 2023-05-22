@@ -18,11 +18,18 @@ const ScheduledDistributionTask = sequelizeConnection.define('scheduled_distribu
     status : {
         type: DataTypes.INTEGER,
         defaultValue: 0
+    },
+    distributor : {
+        type: DataTypes.STRING,
+        defaultValue: ''
+    },
+    distributionTitle : {
+        type: DataTypes.STRING,
+        defaultValue: ''
     }
 }, {
     sequelize: sequelizeConnection,
     paranoid: false,
-    // freezeTableName: true,
     timestamps: true
 })
 
