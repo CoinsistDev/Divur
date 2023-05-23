@@ -2,19 +2,14 @@ import * as departmentsController from '../departments/index.js';
 import * as blacklistController from '../blacklist/index.js';
 import { check, validationResult, matchedData } from 'express-validator';
 import logger from '../../../utils/logger/index.js';
+import { sendEmail } from '../../../utils/email/sendEmail.js';
 import { excelToJson } from '../../../utils/excel/index.js';
 import { addJobsToQueue } from '../message-queue/index.js';
 import { canceldDistribution } from '../message-queue/canceldDistribution.js';
 import { addToMessageBlacklist } from '../../../db/service/MessageLogService.js';
-import { verifyToken } from '../../../db/service/UserService.js';
+import { getUser } from '../../../db/service/UserService.js';
 
 export const sendDistribution = async (req, res) => {
-  const token = req.cookies.jwt;
-  if (!token) {
-    console.log('token is not found');
-    return res.sendStatus(401);
-  }
-
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(500).json({
@@ -24,6 +19,8 @@ export const sendDistribution = async (req, res) => {
   }
   const data = matchedData(req);
   data.Parameters = JSON.parse(data.Parameters);
+  data.departmentId = data.id
+  const protocolType = data.protocolType
   logger.info(`Department:${data.departmentId} New Send data:\n from:${data.From}\n parameters:${JSON.stringify(data.Parameters)} \n date:${data.ScheduleDate}\n message:${data.Message}`);
   const department = await departmentsController.getDetails(data.departmentId);
   data.departmentName = department.name;
@@ -31,14 +28,16 @@ export const sendDistribution = async (req, res) => {
   const blacklist = (await blacklistController.getAll(data.departmentId)).map((blackObj) => blackObj.phone);
   const blacklistSet = new Set(blacklist);
   const clientDataFilter = clientData.filter((x) => !blacklistSet.has(x.phone));
-  const countMessage = data.protocolType === 'SMS' ? department.remainingSMSMessages : department.remainingMessages;
+  const countMessage = protocolType === 'SMS' ? department.remainingSMSMessages : department.remainingMessages;
   if (clientDataFilter.length > countMessage) throw new Error(` מספר הלקוחות בקובץ גדול ממספר ההודעות שנותרו בבנק, נא פנה לשירות הלקוחות Consist.Glassix@glassix.support `);
   if (!clientDataFilter.length) throw new Error(` לא נמצאו לקוחות לשליחה - כנראה אין אנשי קשר בקובץ או שכולם נמצאים בהוסרו מדיוור `);
   ValidateParameters(clientDataFilter, data.Parameters, data.Message);
   const blacklistUsers = clientData.filter((x) => blacklistSet.has(x.phone));
-  const { email } = await verifyToken(token);
+  const { email } = await getUser(req.userId);
   data.userMail = email;
   const response = await addJobsToQueue(clientDataFilter, data);
+  const remainingMessages = countMessage - clientDataFilter.length
+  sendEmail(email, `התראה: סיום שימוש בחבילת הודעות ${protocolType}`, { protocolType,  remainingMessages}, './notificationMessageBank.handlebars');
   addToMessageBlacklist(blacklistUsers, data);
   res.json(response);
 };

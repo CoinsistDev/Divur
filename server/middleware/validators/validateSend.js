@@ -38,7 +38,7 @@ export const validateSend = [
         .toDate().optional({nullable: true})
         // .withMessage('נא להכניס תאריך תקין')
         .bail(),
-    check('departmentId')
+    check('id')
        .isUUID()
         .exists()
         .withMessage('Incorrect departmentId')
