@@ -19,8 +19,8 @@ export const sendDistribution = async (req, res) => {
   }
   const data = matchedData(req);
   data.Parameters = JSON.parse(data.Parameters);
-  data.departmentId = data.id
-  const protocolType = data.protocolType
+  data.departmentId = data.id;
+  const protocolType = data.protocolType;
   logger.info(`Department:${data.departmentId} New Send data:\n from:${data.From}\n parameters:${JSON.stringify(data.Parameters)} \n date:${data.ScheduleDate}\n message:${data.Message}`);
   const department = await departmentsController.getDetails(data.departmentId);
   data.departmentName = department.name;
@@ -36,8 +36,8 @@ export const sendDistribution = async (req, res) => {
   const { email } = await getUser(req.userId);
   data.userMail = email;
   const response = await addJobsToQueue(clientDataFilter, data);
-  const remainingMessages = countMessage - clientDataFilter.length
-  sendEmail(email, `התראה: סיום שימוש בחבילת הודעות ${protocolType}`, { protocolType,  remainingMessages}, './notificationMessageBank.handlebars');
+  const remainingMessages = countMessage - clientDataFilter.length;
+  sendEmail(email, `התראה: סיום שימוש בחבילת הודעות ${protocolType}`, { protocolType, remainingMessages }, './notificationMessageBank.handlebars');
   addToMessageBlacklist(blacklistUsers, data);
   res.json(response);
 };

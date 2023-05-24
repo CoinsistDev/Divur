@@ -42,11 +42,11 @@ export const getLog = async (departmentId, startDate, endDate) => {
   const { count, rows } = query;
 
   const messageLogStats = {
-    totalNonTicketMessageDelivered: rows[0].dataValues.totalNonTicketMessageDelivered || 0,
-    totalNonTicketSent: rows[0].dataValues.totalNonTicketSent || 0,
-    totalNonTicketMessageRead: rows[0].dataValues.totalNonTicketMessageRead || 0,
-    totalNonTicketMessageFailed: rows[0].dataValues.totalNonTicketMessageFailed || 0,
-    totalBlackListMessage: rows[0].dataValues.totalBlackListMessage || 0,
+    totalNonTicketMessageDelivered: rows[0]?.dataValues?.totalNonTicketMessageDelivered || 0,
+    totalNonTicketSent: rows[0]?.dataValues?.totalNonTicketSent || 0,
+    totalNonTicketMessageRead: rows[0]?.dataValues?.totalNonTicketMessageRead || 0,
+    totalNonTicketMessageFailed: rows[0]?.dataValues?.totalNonTicketMessageFailed || 0,
+    totalBlackListMessage: rows[0]?.dataValues?.totalBlackListMessage || 0,
     totalCount: count,
   };
 
