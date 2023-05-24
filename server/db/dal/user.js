@@ -39,7 +39,7 @@ export const getUser = async (email) => {
     console.log(email);
     const UserInfo = await User.findOne({ where: { email }, include: [Role, Department] })
     if (!UserInfo) {
-        throw new Error('Email does not exist')
+        throw new Error(`Email ${email} does not exist`)
     }
     return UserInfo
 }
@@ -47,7 +47,7 @@ export const getUser = async (email) => {
 export const getUserById = async (id) => {
     const UserInfo = await User.findOne({ where: { id } })
     if (!UserInfo) {
-        throw new Error('User id does not exist')
+        throw new Error(`User ${id} does not exist`)
     }
     return UserInfo
 }
@@ -55,7 +55,7 @@ export const getUserById = async (id) => {
 export const getUserByIdAll = async (id) => {
     const UserInfo = await User.findByPk(id, { include: [Role, Department] })
     if (!UserInfo) {
-        throw new Error('User id does not exist')
+        throw new Error(`User ${id} does not exist`)
     }
     return UserInfo
 }
@@ -63,7 +63,7 @@ export const getUserByIdAll = async (id) => {
 export const getUserByUsername = async (userName) => {
     const UserInfo = await User.findOne({ where: { userName } })
     if (!UserInfo) {
-        throw new Error('User id does not exist')
+        throw new Error(`User with userName ${userName} does not exist`)
     }
     return UserInfo
 }

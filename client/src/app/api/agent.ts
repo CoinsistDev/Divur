@@ -111,10 +111,8 @@ const Distribution = {
     formData.append('From', distribtuionData.from);
     formData.append('isInternational', distribtuionData.isInternational ? 'true' : 'false');
     formData.append('Parameters', JSON.stringify(distribtuionData.parameters));
-    if (distribtuionData.protocolType) {
-      formData.append('protocolType', distribtuionData.protocolType);
-    }
-
+    if (distribtuionData.protocolType) formData.append('protocolType', distribtuionData.protocolType);
+    if (distribtuionData.isTimed) formData.append('ScheduleDate', distribtuionData.scheduleDate!.toISOString());
     if (distribtuionData.imageUrl) formData.append('imageUrl', distribtuionData.imageUrl);
 
     const url = `distribution/${distribtuionData.departmentId}`;
@@ -130,8 +128,8 @@ const Messages = {
 };
 
 const Reports = {
-  scheduledDistribution: (id: string, startDate: Date | null, endDate: Date| null, scheduledDistribution: ScheduledTask[]) =>
-    requests.post<any>(`/report/scheduled-distribution-tasks/${id}?startDate=${startDate}&endDate=${endDate}`, scheduledDistribution)
+  scheduledDistribution: (id: string, startDate: Date | null, endDate: Date | null, scheduledDistribution: ScheduledTask[]) =>
+    requests.post<any>(`/report/scheduled-distribution-tasks/${id}?startDate=${startDate}&endDate=${endDate}`, scheduledDistribution),
 };
 
 const DistributionTask = {

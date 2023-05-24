@@ -17,7 +17,7 @@ export default observer(function DistributionForm() {
   const { departmentStore, distrubitionStore } = useStore();
   const { currentDepartment, loadCurrentDepartment } = departmentStore;
   const { cannedRepliesOptions, cannedReplies, loadingCannedReplies, loadCannedReplies } = distrubitionStore;
-  const [errors, setErrors] = useState([]);
+  const [errors, setErrors] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const { id } = useParams<{ id: string }>();
   const [messagingOptions, setMessagingOptions] = useState<any>([]);
@@ -32,31 +32,33 @@ export default observer(function DistributionForm() {
   };
 
   const handleFormSubmit = async (values: DistributionFormValues, resetForm: () => void) => {
-    let newValues: DistributionFormValues = {
-      ...values,
-      departmentId: currentDepartment!.id,
-    };
-
-    await agent.Distribution.send(newValues)
-      .then((response) => {
-        setSubmitted(true);
-        // resetForm()
-        setErrors([]);
-        if (values.isTimed) {
-          var newTask: ScheduledTask = {
-            taskId: response.data.taskId,
-            id: response.data.id,
-            createdAt: new Date(response.data.createdAt),
-            scheduledFor: new Date(response.data.scheduledFor),
-            status: 2,
-            distributor: 'test',
-            distributionTitle: 'test3',
-          };
-          departmentStore.addDistributionTask(newTask);
-        }
-      })
-      .catch((err) => setErrors(err));
+    try {
+      const newValues: DistributionFormValues = {
+        ...values,
+        departmentId: currentDepartment!.id,
+      };
+  
+      const response = await agent.Distribution.send(newValues);
+      setSubmitted(true);
+      setErrors([]);
+  
+      // if (values.isTimed) {
+      //   const newTask: ScheduledTask = {
+      //     taskId: response.data.taskId,
+      //     id: response.data.id,
+      //     createdAt: new Date(response.data.createdAt),
+      //     scheduledFor: new Date(response.data.scheduledFor),
+      //     status: 2,
+      //     distributor: 'test',
+      //     distributionTitle: 'test3',
+      //   };
+      //   departmentStore.addDistributionTask(newTask);
+      // }
+    } catch (error) {
+      setErrors(error as string[]);
+    }
   };
+  
 
   const validationSchema = Yup.object({
     message: Yup.string().required(),
@@ -66,17 +68,10 @@ export default observer(function DistributionForm() {
   useEffect(() => {
     if (id) {
       loadCurrentDepartment(id).then((department) => {
-        var phones = [{}];
-        phones.pop();
-        department?.phoneNumbers.forEach((phone) => {
-          phones.push({ text: phone.phone, value: phone.phone });
-        });
-        const smsDisabled = department ? (department.remainingSMSMessages === 0 ? true : false) : true;
-        setMessagingOptions([
-          { text: 'WhatsApp', value: 'WhatsApp' },
-          { text: 'SMS', value: 'SMS', disabled: smsDisabled },
-        ]);
-        if (phones) setPhoneNumbers(phones);
+        const phones = department?.phoneNumbers.map((phone) => ({ text: phone.phone, value: phone.phone })) || [];
+        const smsDisabled = department ? department.remainingSMSMessages === 0 : true;
+        setMessagingOptions([{ text: 'WhatsApp', value: 'WhatsApp' }, { text: 'SMS', value: 'SMS', disabled: smsDisabled }]);
+        setPhoneNumbers(phones);
       });
     }
   }, [id, loadCurrentDepartment]);
