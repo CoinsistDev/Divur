@@ -11,7 +11,6 @@ import * as Yup from 'yup';
 import { useParams } from 'react-router';
 import { useStore } from '../../../app/stores/store';
 import { observer } from 'mobx-react-lite';
-import { ScheduledTask } from '../../../app/models/scheduledTask';
 
 export default observer(function DistributionForm() {
   const { departmentStore, distrubitionStore } = useStore();
@@ -37,23 +36,11 @@ export default observer(function DistributionForm() {
         ...values,
         departmentId: currentDepartment!.id,
       };
-  
-      const response = await agent.Distribution.send(newValues);
+
+      await agent.Distribution.send(newValues);
       setSubmitted(true);
       setErrors([]);
-  
-      // if (values.isTimed) {
-      //   const newTask: ScheduledTask = {
-      //     taskId: response.data.taskId,
-      //     id: response.data.id,
-      //     createdAt: new Date(response.data.createdAt),
-      //     scheduledFor: new Date(response.data.scheduledFor),
-      //     status: 2,
-      //     distributor: 'test',
-      //     distributionTitle: 'test3',
-      //   };
-      //   departmentStore.addDistributionTask(newTask);
-      // }
+
     } catch (error) {
       setErrors(error as string[]);
     }

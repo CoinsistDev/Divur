@@ -4,6 +4,7 @@ import agent from '../api/agent';
 import { ScheduledTask } from '../models/scheduledTask';
 import { User } from '../models/user';
 import { v4 as uuid } from 'uuid';
+
 export default class departmentStore {
   departmentRegistry = new Map<string, Department>();
   currentDepartment: Department | undefined = undefined;
@@ -185,6 +186,7 @@ export default class departmentStore {
         this.currentDepartment!.totalBlackListMessage = result.totalBlackListMessage!;
         this.loading = false;
       });
+      return result
     } catch (err) {
       console.log(err);
       runInAction(() => (this.loading = false));
