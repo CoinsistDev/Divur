@@ -1,5 +1,5 @@
 import { FieldArray, Form, Formik } from 'formik';
-import { SyntheticEvent, useEffect, useState } from 'react';
+import { SyntheticEvent, useEffect, useState, useRef } from 'react';
 import { Button, Container, Segment, Form as sForm, Header, Divider, Grid, Dropdown, Icon, Message } from 'semantic-ui-react';
 import CustomTextArea from '../../../app/common/form/CustomTextArea';
 import CustomTextInput from '../../../app/common/form/CustomTextInput';
@@ -13,6 +13,7 @@ import { useStore } from '../../../app/stores/store';
 import { observer } from 'mobx-react-lite';
 
 export default observer(function DistributionForm() {
+  const messageRef = useRef<string | null>(null);
   const { departmentStore, distrubitionStore } = useStore();
   const { currentDepartment, loadCurrentDepartment } = departmentStore;
   const { cannedRepliesOptions, cannedReplies, loadingCannedReplies, loadCannedReplies } = distrubitionStore;
@@ -20,17 +21,16 @@ export default observer(function DistributionForm() {
   const [submitted, setSubmitted] = useState(false);
   const { id } = useParams<{ id: string }>();
   const [messagingOptions, setMessagingOptions] = useState<any>([]);
-
   const [distributionValues, setDistributionValues] = useState<DistributionFormValues>(new DistributionFormValues());
   const [phoneNumbers, setPhoneNumbers] = useState<object[]>([]);
 
   const fileChange = (e: SyntheticEvent<HTMLInputElement>) => {
-    var newDistributionVal = distributionValues;
+    const newDistributionVal = distributionValues;
     newDistributionVal.file[0] = e.currentTarget.files![0];
     setDistributionValues({ ...distributionValues, ...newDistributionVal });
   };
 
-  const handleFormSubmit = async (values: DistributionFormValues, resetForm: () => void) => {
+  const handleFormSubmit = async (values: DistributionFormValues) => {
     try {
       const newValues: DistributionFormValues = {
         ...values,
@@ -40,12 +40,10 @@ export default observer(function DistributionForm() {
       await agent.Distribution.send(newValues);
       setSubmitted(true);
       setErrors([]);
-
     } catch (error) {
       setErrors(error as string[]);
     }
   };
-  
 
   const validationSchema = Yup.object({
     message: Yup.string().required(),
@@ -57,7 +55,10 @@ export default observer(function DistributionForm() {
       loadCurrentDepartment(id).then((department) => {
         const phones = department?.phoneNumbers.map((phone) => ({ text: phone.phone, value: phone.phone })) || [];
         const smsDisabled = department ? department.remainingSMSMessages === 0 : true;
-        setMessagingOptions([{ text: 'WhatsApp', value: 'WhatsApp' }, { text: 'SMS', value: 'SMS', disabled: smsDisabled }]);
+        setMessagingOptions([
+          { text: 'WhatsApp', value: 'WhatsApp' },
+          { text: 'SMS', value: 'SMS', disabled: smsDisabled },
+        ]);
         setPhoneNumbers(phones);
       });
     }
@@ -80,8 +81,8 @@ export default observer(function DistributionForm() {
             validationSchema={validationSchema}
             initialValues={distributionValues}
             enableReinitialize
-            onSubmit={async (values, { setSubmitting, resetForm }) => {
-              await handleFormSubmit(values, resetForm);
+            onSubmit={async (values, { setSubmitting }) => {
+              await handleFormSubmit(values);
               setSubmitting(false);
             }}
           >
@@ -89,39 +90,45 @@ export default observer(function DistributionForm() {
               <Form className="ui form" onSubmit={handleSubmit} autoComplete="off">
                 <Header color="blue" sub content="הגדרות דיוור" />
                 <Dropdown
+                  name="from"
                   style={{ margin: '10px 0px 0px 0px' }}
                   placeholder="מספרי טלפון"
                   search
                   selection
                   onChange={(e: SyntheticEvent<HTMLElement>, { name, value }: any) => {
-                    setFieldValue('from', value);
+                    setFieldValue(name, value);
                   }}
                   loading={phoneNumbers.length === 0}
                   options={phoneNumbers}
                 />
                 <Dropdown
+                  name="protocolType"
                   key={currentDepartment?.remainingSMSMessages}
                   style={{ margin: '10px 0px 0px 0px' }}
                   placeholder="בחירת ערוץ"
                   search
                   selection
                   onChange={(e: SyntheticEvent<HTMLElement>, { name, value }: any) => {
-                    setFieldValue('protocolType', value);
+                    setFieldValue(name, value);
                   }}
                   options={messagingOptions}
                 />
 
                 <sForm.Field />
                 <Dropdown
+                  name="message"
                   style={{ margin: '10px 0px' }}
                   placeholder="משפטים מוכנים לבחירה"
                   search
                   selection
                   loading={loadingCannedReplies}
                   options={cannedRepliesOptions}
+                  value={values.message}
                   onOpen={() => currentDepartment && cannedReplies.length === 0 && loadCannedReplies(currentDepartment?.id)}
                   onChange={(e: SyntheticEvent<HTMLElement>, { name, value }: any) => {
-                    setFieldValue('message', value);
+                    console.log('onChange');
+                    setFieldValue(name, value);
+                    messageRef.current = value;
                   }}
                 />
                 <CustomTextArea rows={5} name="message" placeholder="הודעה" />
@@ -140,13 +147,22 @@ export default observer(function DistributionForm() {
                               floated="left"
                               size="mini"
                               primary
-                              icon="plus"
-                              onClick={() =>
-                                push({
-                                  messageParameter: '',
-                                  fileParameter: '',
-                                })
-                              }
+                              icon="edit"
+                              onClick={() => {
+                                setFieldValue('parameters', []);
+                                const pattern = /[^{{}}]+(?=\})/g;
+                                if (messageRef.current) {
+                                  const paramsToAdd = messageRef.current.match(pattern)?.filter((v: string, i: number, a: string[]) => a.indexOf(v) === i);
+                                  if ((paramsToAdd?.length || undefined) && paramsToAdd!.length > 0) {
+                                    paramsToAdd?.forEach((param) =>
+                                      push({
+                                        messageParameter: param,
+                                        fileParameter: '',
+                                      })
+                                    );
+                                  }
+                                }
+                              }}
                             />
                           </Grid.Column>
                         </Grid>

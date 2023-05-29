@@ -4,7 +4,7 @@ import { defaults, Bar } from 'react-chartjs-2';
 import { useStore } from '../../app/stores/store';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Box, Button } from '@mui/material';
+import { Button } from '@mui/material';
 import { observer } from 'mobx-react-lite';
 
 const DEFAULT_DATE = new Date('10/10/1970').toUTCString();
@@ -34,7 +34,7 @@ export default observer(function ReportsDashboard() {
       return;
     }
     if (currentDepartment && startDate && endDate) {
-      const res = await departmentStore.getMessageStats(departmentStore.currentDepartment!.id, startDate?.toString() ?? '', endDate?.toString() ?? '');
+      await departmentStore.getMessageStats(departmentStore.currentDepartment!.id, startDate?.toString() ?? '', endDate?.toString() ?? '');
       updateData();
     }
   };
