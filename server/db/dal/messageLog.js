@@ -77,7 +77,7 @@ export const deleteOldMessages = async () => {
   try {
     MessageLog.destroy({
       where: {
-        Date: { [Op.lte]: new Date(Date.now() - 60 * 60 * 24 * 90 * 1000) },
+        Date: { [Op.lte]: new Date(Date.now() - 60 * 60 * 24 * 365 * 1000) },
       },
     });
   } catch (error) {
