@@ -37,7 +37,8 @@ export const sendDistribution = async (req, res) => {
   data.userMail = email;
   const response = await addJobsToQueue(clientDataFilter, data);
   const remainingMessages = countMessage - clientDataFilter.length;
-  sendEmail(email, `התראה: סיום שימוש בחבילת הודעות ${protocolType}`, { protocolType, remainingMessages }, './notificationMessageBank.handlebars');
+  if (remainingMessages < 1000) 
+      sendEmail(email, `התראה: סיום שימוש בחבילת הודעות ${protocolType}`, { protocolType, remainingMessages }, './notificationMessageBank.handlebars');
   addToMessageBlacklist(blacklistUsers, data);
   res.json(response);
 };
