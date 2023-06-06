@@ -32,12 +32,27 @@ const TimedDistributionsTable = observer(function () {
 
   const handleFilter = () => {
     const filteredTasks = currentDepartment!.scheduledDistributionTasks.filter((task) => {
+      const taskDate = new Date(task.scheduledFor);
+      taskDate.setHours(0, 0, 0, 0);
+  
       if (startDate && endDate) {
-        return task.scheduledFor >= startDate && task.scheduledFor <= endDate;
+        let sDate = new Date(startDate);
+        sDate.setHours(0, 0, 0, 0);
+        
+        let eDate = new Date(endDate);
+        eDate.setHours(23, 59, 59, 999);
+  
+        return taskDate >= sDate && taskDate <= eDate;
       } else if (startDate) {
-        return task.scheduledFor >= startDate;
+        let sDate = new Date(startDate);
+        sDate.setHours(0, 0, 0, 0);
+  
+        return taskDate >= sDate;
       } else if (endDate) {
-        return task.scheduledFor <= endDate;
+        let eDate = new Date(endDate);
+        eDate.setHours(23, 59, 59, 999);
+  
+        return taskDate <= eDate;
       } else {
         return true;
       }
