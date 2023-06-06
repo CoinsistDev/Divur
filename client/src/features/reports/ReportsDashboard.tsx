@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react';
 import { Container, Divider, Form, Grid, Header, Icon } from 'semantic-ui-react';
 import { defaults, Bar } from 'react-chartjs-2';
 import { useStore } from '../../app/stores/store';
-import DatePicker from 'react-datepicker';
+import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import he from 'date-fns/locale/he';
 import { Button } from '@mui/material';
 import { observer } from 'mobx-react-lite';
+
+registerLocale('he', he) 
 
 const DEFAULT_DATE = new Date('10/10/1970').toUTCString();
 const NON_TICKET_MESSAGES_LABELS = ['מוסרים מדיוור', 'הגיעו ליעד', 'נקראו', 'נכשלו', 'נשלחו'];
@@ -141,11 +144,11 @@ export default observer(function ReportsDashboard() {
 }}>
     <div style={{ display: 'flex', flexDirection: 'column', width: '200px' }}>
         <label style={{ marginBottom: '0.5em' }}>מתאריך:</label>
-        <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} dateFormat="dd/MM/yyyy" isClearable />
+        <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} dateFormat="dd/MM/yyyy" locale="he" isClearable />
     </div>
     <div style={{ display: 'flex', flexDirection: 'column', width: '200px' }}>
         <label style={{ marginBottom: '0.5em' }}>עד תאריך:</label>
-        <DatePicker selected={endDate} onChange={(date) => setEndDate(date)} dateFormat="dd/MM/yyyy" isClearable />
+        <DatePicker selected={endDate} onChange={(date) => setEndDate(date)} dateFormat="dd/MM/yyyy" locale="he" isClearable />
     </div>
     <Button onClick={() => filterDate(false)} variant="outlined" color="primary" disabled={!startDate || !endDate} style={{ width: '200px', height:'38px' }}>
         סינון לפי תאריכים

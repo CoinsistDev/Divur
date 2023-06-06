@@ -4,10 +4,14 @@ import { useStore } from '../../app/stores/store';
 import { format } from 'date-fns';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import DatePicker from 'react-datepicker';
+import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import he from 'date-fns/locale/he';
 import TablePlaceholder from './TablePlaceholder';
 import { ScheduledTask } from '../../app/models/scheduledTask';
+import './style.css'
+
+registerLocale('he', he) 
 
 const TimedDistributionsTable = observer(function () {
   const { departmentStore } = useStore();
@@ -86,19 +90,19 @@ const TimedDistributionsTable = observer(function () {
           <Divider />
         </Header>
 
-        <Form celled style={{ direction: 'rtl' }}>
+        <Form style={{ direction: 'rtl' }}>
           <Form.Group>
             <Grid columns={3} stackable style={{ width: '100%' }}>
               <Grid.Column style={{ width: '33%' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                   <label style={{ marginBottom: '0.5em' }}>מתאריך:</label>
-                  <DatePicker selected={startDate} onChange={(date: Date | null) => setStartDate(date)} dateFormat="dd/MM/yyyy" isClearable />
+                  <DatePicker selected={startDate} onChange={(date: Date | null) => setStartDate(date)} dateFormat="dd/MM/yyyy" locale="he" isClearable />
                 </div>
               </Grid.Column>
               <Grid.Column style={{ width: '33%' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                   <label style={{ marginBottom: '0.5em' }}>עד תאריך:</label>
-                  <DatePicker selected={endDate} onChange={(date: Date | null) => setEndDate(date)} dateFormat="dd/MM/yyyy" isClearable />
+                  <DatePicker selected={endDate} onChange={(date: Date | null) => setEndDate(date)} dateFormat="dd/MM/yyyy" locale="he" isClearable />
                 </div>
               </Grid.Column>
               <Grid.Column style={{ width: '33%', textAlign: 'left', display: 'flex', alignItems: 'flex-end' }}>
