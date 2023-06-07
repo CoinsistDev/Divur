@@ -36,8 +36,13 @@ blacklistRouter.get('/', asyncHandler(async (req, res) => {
 
 //  Create
 blacklistRouter.put('/', asyncHandler(async (req, res) => {
-  const query = req.query
-  const result = await blackListController.addClient(query)
+  const result = await blackListController.addClient(req.query)
+  res.status(201).send(result)
+}))
+
+//  Create
+blacklistRouter.post('/', asyncHandler(async (req, res) => {
+  const result = await blackListController.addClient(req.query)
   res.status(201).send(result)
 }))
 
