@@ -5,6 +5,8 @@ import { check, validationResult, matchedData } from "express-validator";
 import { sendEmail } from '../../../utils/email/sendEmail.js'
 import { verifyToken } from '../../../db/service/UserService.js'
 import { excelToJson } from '../../../utils/excel/index.js';
+import { getMinimalDetails } from '../departments/index.js'
+import { uploadFileFromBuffer, getFileDownloadLink } from '../../../utils/blob-storage/upload-file.js'
 
 export const addClient = async (payload) => {
     return mapper.toBlackList(await service.addClient(payload))
@@ -19,8 +21,12 @@ export const getLogDataExcell = async (req, res)=> {
     const departmentId = req.params.id
     const logData = await getAll(departmentId)
     const excellBuffer = await convertToExcelBlackList(logData)
+    const { name: departmentName } = await getMinimalDetails(departmentId)
+    const fileName = `דוח הסרה ממערכת דיוור (${departmentName})`
+    const upload = await uploadFileFromBuffer(fileName + '.xlsx', excellBuffer)
+    const excelReportLink = await getFileDownloadLink(fileName + '.xlsx')
     const { email } = await verifyToken(token)
-    sendEmail(email, "דוח הסרה ממערכת דיוור Consist מוכן עבורך!", null, null, excellBuffer);
+    sendEmail( email, fileName, { excelReportLink }, "./excelReportLink.handlebars");
     res.send(logData)
 }
 
@@ -35,7 +41,6 @@ export const deleteByPhone = async (phoneNumber, departmentId) => {
 
 export const getAll = async (departmentId, page) => {
     const blacklist = (await service.getAll(departmentId, page)).map(mapper.toBlackList)
-    //const blacklist = await service.getAll(departmentId, page)
     return blacklist
 }
 
