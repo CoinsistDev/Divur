@@ -17,8 +17,8 @@ export const update = async (payload) => {
   return mapper.toDepartment(await service.update(payload))
 }
 
-export const cannedReplies = async (departmentId) => {
-  return await service.getGlassixCannedReplies(departmentId)
+export const cannedReplies = async (departmentId, useCache) => {
+  return await service.getGlassixCannedReplies(departmentId, useCache)
 }
 
 export const adduser = async (payload) => {

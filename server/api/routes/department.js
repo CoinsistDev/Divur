@@ -47,7 +47,7 @@ departmentRouter.get('/:id',authorization, asyncHandler(async (req, res) => {
 
 // Get CannedReplies
 departmentRouter.get('/cannedreplies/:id', authorization, isDepartmentUser, asyncHandler(async (req, res) => {
-  const result = await departmentsController.cannedReplies(req.params.id)
+  const result = await departmentsController.cannedReplies(req.params.id, false)
   res.send(result)
 }))
 

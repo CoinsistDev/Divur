@@ -54,8 +54,8 @@ export const update = async (payload) => {
 }
 
 
-export const getGlassixCannedReplies = async (departmentId) => {
-    return await getCannedReplies(departmentId)
+export const getGlassixCannedReplies = async (departmentId, useCache) => {
+    return await getCannedReplies(departmentId, useCache)
 }
 
 export const adduser = async (payload) => {
