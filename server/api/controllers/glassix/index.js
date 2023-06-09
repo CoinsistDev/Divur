@@ -62,9 +62,9 @@ const getEvents = async (departmentId) => {
     });
     return response.data;
   } catch (error) {
-    logger.error(departmentId);
-    const message = error.response?.data?.message || error.message;
-    throw new Error(message);
+      const message = error.response?.data?.message || error.message;
+      logger.error(`departmentId: ${departmentId} - ${message}`);
+    return []
   }
 };
 
