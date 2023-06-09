@@ -47,16 +47,13 @@ export default observer(function ReportsDashboard() {
   };
 
   useEffect(() => {
-    if (currentDepartment) {
-      setNonTicketData([
-        currentDepartment.totalBlackListMessage,
-        currentDepartment.totalNonTicketSent,
-        currentDepartment.totalNonTicketMessageRead,
-        currentDepartment.totalNonTicketMessageFailed,
-        currentDepartment.totalNonTicketMessageDelivered,
-      ]);
-    }
-  }, [currentDepartment]);
+    const fetchData = async () => {
+      await filterDate(false);
+    };
+  
+    fetchData();
+  }, [startDate, endDate, currentDepartment]);
+  
 
   const sendReport = async () => {
     setIsExporting(true);
