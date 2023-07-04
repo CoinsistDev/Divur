@@ -13,13 +13,22 @@ export const sendMessage = async (jobData) => {
     }
 }
 
+const escapeURL = (str) => {
+    try {
+        new URL(str);
+        return new handlebars.SafeString(str);
+    } catch (_) {
+        return str; // If not a URL, return the string as is.
+    }
+}
 
 const getText = (parameters, clientData, message) => {
     message = message.replaceAll('{{', '{{[').replaceAll('}}', ']}}')
     const func = handlebars.compile(message);
     let data = {};
     parameters.forEach((target) => {
-        data[target.messageParameter] = clientData[target.fileParameter];
+        const value = clientData[target.fileParameter];
+        data[target.messageParameter] = escapeURL(value);
     });
     return func(data);
 }

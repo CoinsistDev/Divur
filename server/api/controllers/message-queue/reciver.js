@@ -3,12 +3,13 @@ import { connection } from './redis-connection.js';
 import { sendMessage } from './send-message.js';
 import { updateScheduledJob } from '../../../db/dal/scheduledDistributionTask.js';
 import * as DepartmentService from '../../../db/service/DeparmentService.js';
+import * as blacklistController from '../blacklist/index.js'
 
 const option = {
   connection,
   limiter: {
     max: 120,
-    duration: 60 * 1000,
+    duration: 60 * 1000
   },
 };
 
@@ -16,9 +17,12 @@ export const runWorker = async (MessageQueue) => {
   const queue = new Queue(MessageQueue, { connection });
   let jobCount = await queue.getJobCounts();
   if (jobCount.active || jobCount.delayed || jobCount.waiting) {
-    const worker = new Worker(
-      MessageQueue,
-      async (job) => {
+    console.log('runWorker... ');
+    const worker = new Worker( MessageQueue, async (job) => {
+      const blacklist = (await blacklistController.getAll(job.data.generalData.departmentId, undefined, true)).map(x => x.phone)
+      if (blacklist.includes(job.data.clientData.phone)){
+        return { jobId: `(${job.id}) : is dont sent - client in blacklist` };
+      }
         // await job.updateProgress('TEST 1');
         const result = await sendMessage(job.data);
         if (result?.error) {
