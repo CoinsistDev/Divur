@@ -10,7 +10,7 @@ import { store } from '../stores/store';
 import { toast } from 'react-toastify';
 import Blacklist from '../models/blacklist';
 
-axios.defaults.baseURL = process.env.NODE_ENV === 'development' ? 'http://13.69.58.163/api' : 'https://divur.consist.co.il/api/';
+axios.defaults.baseURL = process.env.NODE_ENV === 'development' ? 'https://divur-dev.consist.co.il/api' : 'https://divur.consist.co.il/api/';
 
 axios.interceptors.request.use((config) => {
   return config;
