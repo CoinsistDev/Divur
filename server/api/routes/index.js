@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { serverAdapter } from '../controllers/message-queue/bull-board.js';
 
 import blacklistRouter from './blacklist.js'
 import departmentRouter from './department.js'
@@ -16,6 +17,8 @@ router.use('/distribution', distributionRouter)
 router.use('/message', messageRouter)
 router.use('/account', accountRouter)
 router.use('/report', reportRouter)
+router.use('/admin/queues', serverAdapter.getRouter());
+
 
 
 export default router

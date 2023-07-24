@@ -5,11 +5,9 @@ import cors from 'cors';
 import routes from './api/routes/index.js';
 import dbInit from './db/init.js';
 import { errorHandler, notFound } from './middleware/errorMiddlware.js';
-import { serverAdapter } from './api/controllers/message-queue/bull-board.js';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import compression from 'compression';
-import logger from './utils/logger/index.js';
 
 dbInit();
 
@@ -28,8 +26,6 @@ if (process.env.CLUSTER_MASTER == 'true' && process.env.NODE_ENV === 'production
   getGlassixEvent();
   deleteOldMessages();
 }
-
-app.use('/admin/queues', serverAdapter.getRouter());
 
 app.use('/', routes);
 
