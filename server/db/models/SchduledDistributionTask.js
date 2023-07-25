@@ -1,9 +1,6 @@
 import { DataTypes } from 'sequelize'
 import sequelizeConnection from '../config.js'
-
 import { Department } from './index.js';
-
-
 
 const ScheduledDistributionTask = sequelizeConnection.define('scheduled_distribution_task', {
     id: {
@@ -26,6 +23,18 @@ const ScheduledDistributionTask = sequelizeConnection.define('scheduled_distribu
     distributionTitle : {
         type: DataTypes.STRING,
         defaultValue: ''
+    },
+    successCount : {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
+    failedCount : {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
+    totalCount : {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
     }
 }, {
     sequelize: sequelizeConnection,

@@ -6,4 +6,7 @@ export interface ScheduledTask{
  status:number;
  distributor: string
  distributionTitle: string
+ successCount: number,
+ failedCount: number,
+ totalCount: number,
 }

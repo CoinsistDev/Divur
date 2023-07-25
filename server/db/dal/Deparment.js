@@ -56,7 +56,7 @@ export const getDetails = async (id) => {
             },
             {
                 model: ScheduledDistributionTask,
-                attributes: ['id', 'createdAt', 'scheduledFor', 'status', 'departmentId', 'distributor', 'distributionTitle']
+                // attributes: ['id', 'createdAt', 'scheduledFor', 'status', 'departmentId', 'distributor', 'distributionTitle']
             },
             {
                 model: PhoneNumber,

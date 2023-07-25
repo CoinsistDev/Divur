@@ -2,7 +2,7 @@ import { Worker, Queue } from 'bullmq';
 import { addQueue } from './bull-board.js';
 import { connection } from './redis-connection.js';
 import { sendMessage } from './send-message.js';
-import { updateScheduledJob } from '../../../db/dal/scheduledDistributionTask.js';
+import { updateScheduledJob, incrementCount } from '../../../db/dal/scheduledDistributionTask.js';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter.js';
 import * as DepartmentService from '../../../db/service/DeparmentService.js';
 import * as blacklistController from '../blacklist/index.js';
@@ -29,9 +29,10 @@ const isPhoneBlacklisted = async (job) => {
   return blacklist.includes(job.data.clientData.phone);
 };
 
-const handleCompletedJob = async (job) => {
+const handleCompletedJob = (job) => {
   const { protocolType, departmentId } = job.data.generalData;
-  await DepartmentService.updateCountMessage({ departmentId, count: 1, protocolType }, 'decrementing');
+  DepartmentService.updateCountMessage({ departmentId, count: 1, protocolType }, 'decrementing');
+  incrementCount('successCount', 1, job.queue.name)
 };
 
 const handleDrainedQueue = async (worker, queue) => {
@@ -39,7 +40,15 @@ const handleDrainedQueue = async (worker, queue) => {
   if (!jobCount.active && !jobCount.delayed && !jobCount.failed && !jobCount.waiting) {
     await updateScheduledJob(queue.name, 0);
     await worker.close();
-    logger.info('All messages sent');
+    logger.info(`All messages sent in queue: ${queue.name}`);
+  }
+};
+
+const handleFailedQueue = async (job, err) => {
+  logger.error(`Failed job ${job.id} with error: ${err}`);
+  if (job.attemptsMade >= job.opts.attempts) {
+    logger.error(`Job ${job.id} has exhausted all retry attempts.`);
+    incrementCount('failedCount', 1, job.queue.name)
   }
 };
 
@@ -68,7 +77,7 @@ export const runWorker = async (MessageQueue, newQueue) => {
     );
 
     worker.on('completed', handleCompletedJob);
-    worker.on('failed', (job, err) => logger.error(`Failed job ${job.id} with error: ${err}`));
+    worker.on('failed', handleFailedQueue);
     worker.on('error', (err) => logger.error(`Worker error: ${err}`));
     worker.on('drained', () => handleDrainedQueue(worker, queue));
     worker.on('closed', () => logger.warn('Worker closed'));

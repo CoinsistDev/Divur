@@ -94,8 +94,8 @@ const TimedDistributionsTable = observer(function () {
 
   return (
     <Grid>
-      <Grid.Column computer={4}></Grid.Column>
-      <Grid.Column computer={11}>
+      <Grid.Column computer={2}></Grid.Column>
+      <Grid.Column computer={13}>
         <Header textAlign="right" as="h2" style={{ paddingBottom: '20px', direction: 'rtl', marginTop: '40px' }}>
           <Icon name="book" style={{ paddingLeft: '20px' }} />
           <Header.Content>
@@ -134,18 +134,26 @@ const TimedDistributionsTable = observer(function () {
           <Table celled style={{ direction: 'rtl' }}>
             <Table.Header>
               <Table.Row textAlign="right">
-                <Table.HeaderCell>נוצרה בתאריך</Table.HeaderCell>
-                <Table.HeaderCell>מתוזמנת לתאריך</Table.HeaderCell>
-                <Table.HeaderCell>סטטוס</Table.HeaderCell>
-                <Table.HeaderCell>משתמש שהפיץ</Table.HeaderCell>
-                <Table.HeaderCell>שם תבנית</Table.HeaderCell>
-                <Table.HeaderCell>פעולות</Table.HeaderCell>
+                <Table.HeaderCell width={1}>מספר הפצה</Table.HeaderCell>
+                <Table.HeaderCell width={1}>כמות לשליחה</Table.HeaderCell>
+                <Table.HeaderCell width={1}>הצלחה</Table.HeaderCell>
+                <Table.HeaderCell width={1}>כישלון</Table.HeaderCell>
+                <Table.HeaderCell width={1}>נוצרה בתאריך</Table.HeaderCell>
+                <Table.HeaderCell width={1}>מתוזמנת לתאריך</Table.HeaderCell>
+                <Table.HeaderCell width={2}>סטטוס</Table.HeaderCell>
+                <Table.HeaderCell width={1}>משתמש שהפיץ</Table.HeaderCell>
+                <Table.HeaderCell width={2}>שם תבנית</Table.HeaderCell>
+                <Table.HeaderCell width={1}>פעולות</Table.HeaderCell>
               </Table.Row>
             </Table.Header>
 
             <Table.Body>
               {getCurrentPageItems().map((task: ScheduledTask) => (
                 <Table.Row textAlign="right" key={task.id}>
+                  <Table.Cell>{task.id}</Table.Cell>
+                  <Table.Cell style={{color: 'blue'}}>{task.totalCount}</Table.Cell>
+                  <Table.Cell style={{color: 'green'}}>{task.successCount}</Table.Cell>
+                  <Table.Cell style={{color: 'red'}}>{task.failedCount}</Table.Cell>
                   <Table.Cell>{format(task.createdAt, 'dd/MM/yyyy HH:mm')}</Table.Cell>
                   <Table.Cell>{format(task.scheduledFor, 'dd/MM/yyyy HH:mm')}</Table.Cell>
                   <Table.Cell negative={task.status === 1 || task.status === 3} positive={task.status === 0} warning={task.status === 2}>

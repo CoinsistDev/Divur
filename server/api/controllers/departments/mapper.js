@@ -96,8 +96,10 @@ export const toScheduledDistributionTasks = (task) => {
         status : task.status,
         department : task.departmentId,
         distributor : task.distributor,
-        distributionTitle : task.distributionTitle
-
+        distributionTitle : task.distributionTitle,
+        totalCount : task.totalCount,
+        failedCount : task.failedCount,
+        successCount : task.successCount
     }))
     return fixTask
 }

@@ -82,5 +82,4 @@ export const getById = (id) => {
 export const updateCountMessage = async (payload, method) => {
     payload.field = payload.protocolType === 'SMS' ? 'remainingSMSMessages' : 'remainingMessages'
     return method === 'Incrementing' ? DepartmentDal.incrementMessage(payload) : DepartmentDal.decrementMessage(payload)
-   //  DepartmentDal.decrementMessage(payload)
 }

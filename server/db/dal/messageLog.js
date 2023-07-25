@@ -10,7 +10,6 @@ export const create = async (payload) => {
 export const createBulk = async (payload) => {
   try {
     const mesLog = await MessageLog.bulkCreate(payload);
-    console.log('createBulk success');
     return true;
   } catch (error) {
     logger.error(error);

@@ -1,17 +1,17 @@
 import handlebars from 'handlebars'
 import { sendNonTicket } from '../glassix/index.js'
+import logger from '../../../utils/logger/index.js';
 
 export const sendMessage = async (jobData) => {
     try {
-        const { clientData, generalData } = jobData
-        const text = getText(generalData.Parameters, clientData, generalData.Message)
-        return await sendNonTicket(generalData.departmentId, generalData, clientData.phone, text)
+        const { clientData, generalData } = jobData;
+        const text = getText(generalData.Parameters, clientData, generalData.Message);
+        return await sendNonTicket(generalData.departmentId, generalData, clientData.phone, text);
     } catch (error) {
-        console.log('sendMessage ERR');
-        console.log(error);
-        return { error: true, message: error }
+        logger.error('Error encountered in sendMessage:', error);
+        return { error: true, message: error.message };
     }
-}
+};
 
 const escapeURL = (str) => {
     try {

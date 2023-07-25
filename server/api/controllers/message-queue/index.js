@@ -1,5 +1,4 @@
 import logger from '../../../utils/logger/index.js'
-import moment from 'moment';
 import { FlowProducer } from 'bullmq';
 import { runWorker } from './reciver.js';
 import { createScheduledJob } from '../../../db/dal/scheduledDistributionTask.js';
@@ -13,29 +12,30 @@ export const addJobsToQueue = async (clientData, generalData) => {
     maxStalledCount: 0,
     backoff: {
       type: 'exponential',
-      delay: 25000,
+      delay: 40000,
     },
   };
 
   try {
     const distributionTitle = await getCannedRepliesTitleEvent(generalData.departmentId, generalData.Message);
-
-    let scheduleJobDB;
+    const clientLength = clientData.length;
+    let scheduleDate = new Date();
+    let delay = 0;
     if (generalData.ScheduleDate) {
       logger.info('Scheduling date set. Creating Scheduled job.');
-      const timeToSendMoment = moment(generalData.ScheduleDate);
-      const nowMoment = moment(new Date());
-      const diff = timeToSendMoment.diff(nowMoment);
-      option.delay = diff;
-      scheduleJobDB = await createScheduledJob(generalData.ScheduleDate, generalData.departmentId, generalData.userMail, distributionTitle);
+      scheduleDate = new Date(generalData.ScheduleDate);
+      delay = scheduleDate.getTime() - Date.now();
+      option.delay = delay;
     } else {
       logger.info('No scheduling date set. Creating Scheduled job with current date.');
-      scheduleJobDB = await createScheduledJob(new Date(), generalData.departmentId, generalData.userMail, distributionTitle);
     }
+    
+    const scheduleJobDB = await createScheduledJob(scheduleDate, generalData.departmentId, generalData.userMail, distributionTitle, clientLength);
+    
 
-    const children = clientData.map((client) => ({
+    const children = clientData.map((clientData) => ({
       name: generalData.departmentName,
-      data: { client, generalData },
+      data: { clientData, generalData },
       queueName: scheduleJobDB.id.toString(),
       opts: option,
     }));
