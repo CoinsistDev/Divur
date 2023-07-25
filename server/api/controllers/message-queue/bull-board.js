@@ -21,6 +21,11 @@ const queueAdapter = queueTitles.map(q => new BullMQAdapter(new Queue(q.queueNam
 const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
     queues: queueAdapter,
     serverAdapter,
+    options: {
+        uiConfig: {
+            boardTitle: 'Consist Divur',
+        }
+    }
 });
 
 
