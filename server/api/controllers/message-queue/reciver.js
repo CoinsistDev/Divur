@@ -36,12 +36,9 @@ const handleCompletedJob = (job) => {
 };
 
 const handleDrainedQueue = async (worker, queue) => {
-  const jobCount = await queue.getJobCounts();
-  if (!jobCount.active && !jobCount.delayed && !jobCount.failed && !jobCount.waiting) {
     await updateScheduledJob(queue.name, 0);
     await worker.close();
     logger.info(`All messages sent in queue: ${queue.name}`);
-  }
 };
 
 const handleFailedQueue = async (job, err) => {

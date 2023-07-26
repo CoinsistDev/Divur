@@ -1,8 +1,8 @@
-import { query, Router } from 'express'
+import { Router } from 'express'
 import asyncHandler from "express-async-handler"
 import bcrypt from 'bcrypt'
-import { deleteByEmail, CreateUserObject, setRole, getUserFromHomePage, getUserByMail, refreshToken, getUserDepartments, GetCurrentUserDepartments, updateLastDepartment, updatePhoneNumber, logout } from '../controllers/account/index.js'
-import { signup, requestPasswordReset, resetPassword, verifyToken } from '../../db/service/UserService.js'
+import { getUsers, deleteByEmail, CreateUserObject, setRole, getUserFromHomePage, getUserByMail, refreshToken, getUserDepartments, GetCurrentUserDepartments, updateLastDepartment, updatePhoneNumber, logout } from '../controllers/account/index.js'
+import { signup, requestPasswordReset, resetPassword } from '../../db/service/UserService.js'
 import * as authService from '../../db/service/AuthService.js'
 import crypto from 'crypto'
 import { sendOtp, VerifyOtp, cancelOtp } from '../controllers/voanage/OTPSender.js'
@@ -35,6 +35,9 @@ accountRouter.get('/', asyncHandler(getUserFromHomePage))
 
 // Get User Departments
 accountRouter.get('/departments/:email', authorization, isAdminOrImplementor, asyncHandler(getUserDepartments))
+
+// Get All User
+accountRouter.get('/all', authorization, isAdmin, asyncHandler(getUsers))
 
 // Get Current User Departments
 accountRouter.get('/departments', asyncHandler(GetCurrentUserDepartments))

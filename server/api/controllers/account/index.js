@@ -23,6 +23,11 @@ export const register = async (departmentId, payload, reqOrigin) => {
 }
 
 
+export const getUsers = async (req, res) => {
+  const users = await serviceDal.getAllUsers()
+  return res.send(users)
+}
+
 export const CreateUserObject = async (user, Cookies) => {
   const departments = await service.getDepartments(user.id)
   const roles = await service.getRoles(user.id)
